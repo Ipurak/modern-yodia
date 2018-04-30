@@ -137,7 +137,7 @@ var productList = (function(){
 		console.log( item )
 		let modal = BootstrapModal();
 	        modal.header.append( '<i class="fas fa-shopping-bag"></i> Shopping Room', data.modal.close );
-	        modal.body.append( createShowProduct() );
+	        modal.body.append( createShowProduct(typ) );
 	        modal.footer.append( data.modal.footer );
 	        modal.shown(function(){
 	        	$('body').css({'overflow':'hidden'});
@@ -146,24 +146,24 @@ var productList = (function(){
 	        	$('body').css({'overflow':'auto'});
 	        });
 	        setTimeout(function(){
-	        	updateProductSelectedUI({product:typ,size:data.modal.sizeActive});
+						updateProductSelectedUI({product:typ,size:data.modal.sizeActive});
 	        },200);
 	        modal.open();
 	}
 
-	var createShowProduct = function(){
+	var createShowProduct = function(typ){
 
 		let bodyElement = $(data.modal.body);
 		let bodyToShow = '';
 
 		//create body product
-		createBodyProduct(bodyElement);
+		createBodyProduct(bodyElement,typ);
 
 		bodyToShow = bodyElement;
 		return bodyToShow;
 	}
 
-	var createBodyProduct = function( bodyElement ){
+	var createBodyProduct = function( bodyElement,typ ){
 		$.each(data.products,function(index,product){
 			var newImg = $('<a>').attr({'typ':index}).append($('<img>').addClass('map-product-img').attr({'src':product.imgs.ex}));
 			var newLi  = $('<li>').append(newImg);
@@ -184,10 +184,20 @@ var productList = (function(){
 			//show size
 			showSize($('.map-product-active').attr('typ'),$(this).attr('typ'),bodyElement);
 		});
+		showSize( typ, data.modal.sizeActive, bodyElement );
 	}
 
 	var showSize = function(product,size,bodyElement){
-		$('.show-size',bodyElement).html(data.products[product].details.itemsize[size].h );
+		let textSize = [
+			'<b>',
+			data.products[product].details.itemsize[size].h,
+			' '+data.products[product].details.typesize+' ',
+			' / ',
+			data.products[product].details.itemsize[size].w+' ',
+			data.products[product].details.typesize+' ',
+			'</b>'
+		].join('\n');
+		$('.show-size',bodyElement).html( textSize );
 	}
 
 	var updateProductSelectedData = function( params ){
@@ -208,19 +218,22 @@ var productList = (function(){
 			'background-image':'url("'+data.products[params.product].details.itemsize[params.size].imgs[0]+'")',
 			'width':'100px',
 			'height':'100px'
-		}).attr('url',data.products[params.product].details.itemsize[params.size].imgs[0])
+		}).attr('url',data.products[params.product].details.itemsize[params.size].imgs[0]);
 		$('.list-img-1').css({
 			'background-image':'url("'+data.products[params.product].details.itemsize[params.size].imgs[1]+'")',
 			'width':'100px',
 			'height':'100px'
-		}).attr('url',data.products[params.product].details.itemsize[params.size].imgs[1])
+		}).attr('url',data.products[params.product].details.itemsize[params.size].imgs[1]);
 		$('.list-img-2').css({
 			'background-image':'url("'+data.products[params.product].details.itemsize[params.size].imgs[2]+'")',
 			'width':'100px',
 			'height':'100px'
-		}).attr('url',data.products[params.product].details.itemsize[params.size].imgs[2])
+		}).attr('url',data.products[params.product].details.itemsize[params.size].imgs[2]);
 		//update product active
-		$('.active-img > img').attr('src',data.products[params.product].details.itemsize[params.size].imgs[2])
+		$('.active-img > img').attr({
+			'src':data.products[params.product].details.itemsize[params.size].imgs[2],
+			'data-zoom-image':data.products[params.product].details.itemsize[params.size].imgs[2]
+		});
 		//update product detail wording
 
 	}
