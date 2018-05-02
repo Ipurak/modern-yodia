@@ -26,7 +26,8 @@ var productList = (function() {
 				</button>
 				`,
             body: `
-				<div class="row">
+                <div class="row body-product body-proceed">Proceed</div>
+				<div class="row body-product body-shop">
 					<div class="map-product-content">
 						<ul class="nav nav-pills ct-blue map-product-main"></ul>
 					</div>
@@ -160,7 +161,7 @@ var productList = (function() {
         let item = data.products[typ]
         console.log(item)
         let modal = BootstrapModal();
-        modal.header.append('<i class="fas fa-shopping-bag"></i> Shopping Room', data.modal.displayCartNumber);
+        modal.header.append(createHeader());
         modal.body.append(createShowProduct(typ));
         modal.footer.append(data.modal.footer);
         modal.shown(function() {
@@ -173,6 +174,15 @@ var productList = (function() {
             updateProductSelectedUI({ product: typ, size: data.modal.sizeActive });
         }, 200);
         modal.open();
+    }
+
+    var createHeader = function(){
+        let headerElement = $('<i class="fas fa-shopping-bag"></i> Shopping Room'+data.modal.displayCartNumber);
+        let headerToShow = '';
+        $('.cart-btn',headerElement).click(proceedCart);
+
+        headerToShow = headerElement;
+        return headerToShow;
     }
 
     var createShowProduct = function(typ) {
@@ -213,10 +223,21 @@ var productList = (function() {
             showSize($('.map-product-active').attr('typ'), $(this).attr('typ'), bodyElement);
         });
 
-        $('.add-cart', bodyElement).click(addCart);
-
         showSize(typ, data.modal.sizeActive, bodyElement);
 
+        $('.add-cart', bodyElement).click(addCart);
+
+    }
+    
+    var routeShow = function(whichBody){
+        $('.body-product').hide();
+        $('body-'+whichBody).show();
+    }
+
+    var proceedCart = function(){
+        if(data.cart.length < 1){alert('The cart is empty.');return 0;}//Block if cart is empty
+        alert('The cart is not empty');
+        routeShow('proceed');
     }
 
     var addCart = function() {
@@ -227,6 +248,7 @@ var productList = (function() {
             size: $('.product-size.active').attr('typ')
         });
         updateCartNumber() //update number at cart button
+        console.log("Cart object: ",data.cart);
     }
 
     var delCart = function(indexArrayToDelete) {
