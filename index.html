@@ -21,6 +21,8 @@
     <link rel="stylesheet" type="text/css" href="assets/css/custom.css">
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.css" </head>
 
+    
+</head>
     <body>
         <div id="navbar-full">
             <div class="container">
@@ -100,7 +102,6 @@
             </div>
         </div>
 
-
     </body>
 
     <script type="text/javascript" src="jquery/jquery-1.10.2.js"></script>
@@ -108,5 +109,28 @@
     <script type="text/javascript" src="bootstrap3/js/bootstrap.js"></script>
     <script type="text/javascript" src="assets/js/product-thai-yan.js"></script>
     <script type="text/javascript" src="assets/js/custom.js"></script>
+
+    <!-- ########## [START] Image Zoom ########## -->
+        <script src="assets/js/lightzoom.js"></script>
+        <style>
+            #glass {
+                position: absolute;
+                border-radius: 50%;
+                box-shadow: 0 0 0 7px rgba(255, 255, 255, 0.85), 0 0 7px 7px rgba(0, 0, 0, 0.25), inset 0 0 40px 2px rgba(0, 0, 0, 0.25);
+                display: none;
+                background-repeat: no-repeat;
+                background-color: rgba(0,0,0,.6);
+                z-index: 9999999;
+            }
+        </style>
+        <script>
+            $(document).ready(function () {
+                $('img.light-zoom').lightzoom({
+                    zoomPower   : 2,
+                    glassSize   : 180
+                });
+            });
+        </script>
+    <!-- ########## [END] Image Zoom ########## -->
 
 </html>

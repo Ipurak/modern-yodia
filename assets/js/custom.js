@@ -11,6 +11,16 @@ $(document).ready(function() {
 
     productList.init("productList", product_yanthai);
 
+    $('body').on({
+        click:function(){
+            $(this).addClass('animated rubberBand');
+            let vm = $(this);
+            setTimeout(function(){
+                vm.removeClass('animated rubberBand');
+            },800);
+        }
+    },'.btn');
+
 });
 
 var productList = (function() {
@@ -19,14 +29,14 @@ var productList = (function() {
         modal: {
             close: `<button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>`,
             displayCartNumber: `
-				<button class="btn btn-primary pull-right cart-btn">
+				<div class="pull-right cart-btn">
 					<i class="fas fa-shopping-cart"></i>
 					<span class="product-number">0</span>
-					proceed to cart
-				</button>
+					<span class="proceedCart"><br>proceed<br> to<br> cart <span class="proceedCart-here">here</span></span>
+				</div>
 				`,
             body: `
-                <div class="row body-product body-proceed">Proceed</div>
+                <div class="row body-product body-proceed"></div>
 				<div class="row body-product body-shop">
 					<div class="map-product-content">
 						<ul class="nav nav-pills ct-blue map-product-main"></ul>
@@ -42,7 +52,7 @@ var productList = (function() {
 						</div>
 					</div>
 					<div class="col-xs-12 col-sm-5 col-md-5">
-						<div class="active-img">
+						<div class="active-img light-zoom">
 							<img src="https://displate.com/image-visualisation/standard/16/2018-04-24/e5f9a44ecece7ff774f15ea8983b5092_a0296512a844355d01e11c6280bbb0d3.jpg?w=640&amp;h=640&amp;v=3" >
 						</div>
 					</div>
@@ -138,12 +148,12 @@ var productList = (function() {
         data.element = element;
         data.products = products;
         careateProductList();
-        events()
+        events();
     }
     var careateProductList = function() {
         $.each(data.products, function(index, product) {
             var newComponent = $(data.component);
-            $('img', newComponent).attr('src', product.imgs.ex);
+            $('img', newComponent).attr('src', product.imgs.ex).addClass('light-zoom');
             $('h4', newComponent).text(product.name);
             $('.addToCart', newComponent).attr('typ', index);
             $('.learnMore', newComponent).attr('typ', index);
@@ -174,6 +184,7 @@ var productList = (function() {
             updateProductSelectedUI({ product: typ, size: data.modal.sizeActive });
         }, 200);
         modal.open();
+         
     }
 
     var createHeader = function(){
@@ -211,8 +222,7 @@ var productList = (function() {
         });
 
         $('.list-img > div', bodyElement).click(function() {
-            console.log($(this).attr('url'))
-            $('.active-img > img').attr('src', $(this).attr('url'));
+            $('.active-img > img').attr('src', $(this).attr('url')); 
         });
 
         $('.product-size', bodyElement).click(function() {
@@ -261,9 +271,9 @@ var productList = (function() {
         $.each(cartObj, function(index, obj) {
             tempNumber += Number(obj.number);
         });
-        $('.cart-btn').addClass('animated rubberBand');
+        $('.product-number').addClass('animated rubberBand');
         setTimeout(function() {
-            $('.cart-btn').removeClass('animated rubberBand');
+            $('.product-number').removeClass('animated rubberBand');
             $('.product-number').html(tempNumber);
         }, 700);
 
@@ -313,8 +323,7 @@ var productList = (function() {
         }).attr('url', data.products[params.product].details.itemsize[params.size].imgs[2]);
         //update product active
         $('.active-img > img').attr({
-            'src': data.products[params.product].details.itemsize[params.size].imgs[2],
-            'data-zoom-image': data.products[params.product].details.itemsize[params.size].imgs[2]
+            'src': data.products[params.product].details.itemsize[params.size].imgs[2]
         });
         //update product detail wording
         $('.product-desc').html(data.products[params.product].details.desc);

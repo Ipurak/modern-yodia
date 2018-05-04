@@ -65,13 +65,42 @@ a.learnMore {
 .cart-btn {
     width: 220px;
     font-size: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid red;
+}
+
+.cart-btn:hover{
+    border-bottom: 1px solid;
+}
+
+.cart-btn > i{
+    font-size: 35px;
 }
 
 .product-number {
-    background-color: red;
-    padding: 5px;
-    border-radius: 20px 25px 20px 25px;
+    border-radius: 10px;
+    width: 31px;
     color: #fff;
+    height: 20px;
+    font-weight: bold;
+    padding: 2px 0px 0px 1px;
+    right: 92px;
+    font-size: medium;
+    position: absolute;
+}
+
+.proceedCart{
+    position: absolute;
+    top: -14px;
+    padding-left: 5px;
+    padding-top: 4px;
+}
+
+.proceedCart-here{
+    font-size: 21px;
+    position: absolute;
+    top: 34px;
+    padding-left: 3px;
 }
 
 
