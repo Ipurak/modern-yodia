@@ -12,106 +12,155 @@ $(document).ready(function() {
     productList.init("productList", product_yanthai);
 
     $('body').on({
-        click:function(){
+        click: function() {
             $(this).addClass('animated rubberBand');
             let vm = $(this);
-            setTimeout(function(){
+            setTimeout(function() {
                 vm.removeClass('animated rubberBand');
-            },800);
+            }, 800);
         }
-    },'.btn');
+    }, '.btn');
 
 });
 
 var productList = (function() {
     var data = {
         cart: [],
+        step: 0, //0 = shop, 1 = proceed to cart, 2 = form, 3 = confirm info
         modal: {
+            proceed: {
+                list: `
+                        <div class="row">
+                            <div class="col-md-3">img</div>
+                            <div class="col-md-3">
+                                Quantity:
+                                <select class="form-control">
+                                    <option>1</option>
+                                    <option>2</option>
+                                    <option>3</option>
+                                    <option>4</option>
+                                    <option>5</option>
+                                    <option>6</option>
+                                    <option>7</option>
+                                    <option>8</option>
+                                    <option>9</option>
+                                    <option>10</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                Size:
+                                <select class="form-control">
+                                    <option>M</option>
+                                    <option>L</option>
+                                    <option>XL</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                SubTotal
+                            </div>
+                        </div>
+                `,
+                orderDetail: `
+                    Order Detail!
+                `
+            },
             close: `<button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>`,
             displayCartNumber: `
-				<div class="pull-right cart-btn">
+				<div class="pull-right cart-btn body-next">
 					<i class="fas fa-shopping-cart"></i>
 					<span class="product-number">0</span>
-					<span class="proceedCart"><br>proceed<br> to<br> cart <span class="proceedCart-here">here</span></span>
+					<span class="next-step">Next Step >></span>
+                </div>
+                <div class="pull-right body-back">
+				    << Back
 				</div>
 				`,
             body: `
-                <div class="row body-product body-proceed"></div>
-				<div class="row body-product body-shop">
-					<div class="map-product-content">
-						<ul class="nav nav-pills ct-blue map-product-main"></ul>
-					</div>
-					<hr>
-				</div>
-				<div class="row">
-					<div class="col-xs-12 col-sm-2 col-md-2">
-						<div class="list-img">
-							<div class="list-img-0"></div>
-							<div class="list-img-1"></div>
-							<div class="list-img-2"></div>
-						</div>
-					</div>
-					<div class="col-xs-12 col-sm-5 col-md-5">
-						<div class="active-img light-zoom">
-							<img src="https://displate.com/image-visualisation/standard/16/2018-04-24/e5f9a44ecece7ff774f15ea8983b5092_a0296512a844355d01e11c6280bbb0d3.jpg?w=640&amp;h=640&amp;v=3" >
-						</div>
-					</div>
-					<div class="col-xs-12 col-sm-5 col-md-5">
-						<div class="detail-content">
-							<h3 class="product-name"></h3>
-							<div>
-								<span><b>Select Size: </b></span><span class="show-size"></span>
-								<ul class="nav nav-pills ct-blue">
-									<li class="active product-size" typ="m"><a href="#">M</a></li>
-								    <li class='product-size' typ='l'><a href="#">L</a></li>
-								    <li class='product-size' typ='xl'><a href="#">XL</a></li>
-								</ul>
-							</div>
-							<p class="product-desc">
-								products detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detail
-							</p>
-							<div class="row">
-								<div class="col-xs-12 col-sm-12 col-md-2">
-										<select class="form-control product-quantity" id="sel1">
-											<option>1</option>
-											<option>2</option>
-											<option>3</option>
-											<option>4</option>
-											<option>5</option>
-											<option>6</option>
-											<option>7</option>
-											<option>8</option>
-											<option>9</option>
-											<option>10</option>
-										</select>
-										<a href='#'><span class="info-button">Select Quantity</span></a>
-								</div>
-								<div class="col-xs-12 col-sm-12 col-md-4">
-									<button class="btn btn-primary btn-fill pull-right"><i class="far fa-credit-card"></i> Buy Now</button>
-									<a href='#'><span class="info-button">Immediately checkout</span></a>
-								</div>
-								<div class="col-xs-12 col-sm-12 col-md-1">
-									<span style="line-height: 38px;">or</span>
-								</div>
-								<div class="col-xs-12 col-sm-12 col-md-5">
-									<button class="btn btn-primary btn-fill add-cart"><i class="fas fa-cart-plus"></i> Add to cart</button>
-								</div>
-							</div>
-							<div class="row">
-								<div class="col-md-4"></div>
-								<div class="col-md-4">
-									<p>
-										Delivery to Thailand
-										Estimated 4-5 days
-									</p>
-								</div>
-								<div class="col-md-4"></div>
+                <div class="row body-product body-1"><!--########## [STEP-1]PROCEED TO CART #########-->
+                    <div class="row">
+                        <div class="col-md-6 body-1-list">
+                        </div>
+                        <div class="col-md-6 body-1-orderDetail">
+                        </div>
+                    </div>
+                </div>
+                <div class="row body-product body-0"><!--########## [STEP-0]SHOP ##########-->
+                    <div class="row">
+                        <div class="map-product-content">
+                            <ul class="nav nav-pills ct-blue map-product-main"></ul>
+                        </div>
+                        <hr>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-2 col-md-2">
+                            <div class="list-img">
+                                <div class="list-img-0"></div>
+                                <div class="list-img-1"></div>
+                                <div class="list-img-2"></div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-5 col-md-5">
+                            <div class="active-img light-zoom">
+                                <img src="https://displate.com/image-visualisation/standard/16/2018-04-24/e5f9a44ecece7ff774f15ea8983b5092_a0296512a844355d01e11c6280bbb0d3.jpg?w=640&amp;h=640&amp;v=3" >
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-5 col-md-5">
+                            <div class="detail-content">
+                                <h3 class="product-name"></h3>
+                                <div>
+                                    <span><b>Select Size: </b></span><span class="show-size"></span>
+                                    <ul class="nav nav-pills ct-blue">
+                                        <li class="active product-size" typ="m"><a href="#">M</a></li>
+                                        <li class='product-size' typ='l'><a href="#">L</a></li>
+                                        <li class='product-size' typ='xl'><a href="#">XL</a></li>
+                                    </ul>
+                                </div>
+                                <p class="product-desc">
+                                    products detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detailproducts detail
+                                </p>
+                                <div class="row">
+                                    <div class="col-xs-12 col-sm-12 col-md-2">
+                                            <select class="form-control product-quantity" id="sel1">
+                                                <option>1</option>
+                                                <option>2</option>
+                                                <option>3</option>
+                                                <option>4</option>
+                                                <option>5</option>
+                                                <option>6</option>
+                                                <option>7</option>
+                                                <option>8</option>
+                                                <option>9</option>
+                                                <option>10</option>
+                                            </select>
+                                            <a href='#'><span class="info-button">Select Quantity</span></a>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-12 col-md-4">
+                                        <button class="btn btn-primary btn-fill pull-right"><i class="far fa-credit-card"></i> Buy Now</button>
+                                        <a href='#'><span class="info-button">Immediately checkout</span></a>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-12 col-md-1">
+                                        <span style="line-height: 38px;">or</span>
+                                    </div>
+                                    <div class="col-xs-12 col-sm-12 col-md-5">
+                                        <button class="btn btn-primary btn-fill add-cart"><i class="fas fa-cart-plus"></i> Add to cart</button>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4"></div>
+                                    <div class="col-md-4">
+                                        <p>
+                                            Delivery to Thailand
+                                            Estimated 4-5 days
+                                        </p>
+                                    </div>
+                                    <div class="col-md-4"></div>
 
-								
-							</div>
-						</div>
-					</div>
-				</div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 			`,
             footer: `
 				<button class="btn btn-primary btn-fill closeModal" data-dismiss="modal">
@@ -184,17 +233,89 @@ var productList = (function() {
             updateProductSelectedUI({ product: typ, size: data.modal.sizeActive });
         }, 200);
         modal.open();
-         
+
     }
 
-    var createHeader = function(){
-        let headerElement = $('<i class="fas fa-shopping-bag"></i> Shopping Room'+data.modal.displayCartNumber);
+    // ########## [START]HEADER ZONE ##########
+
+    var createHeader = function() {
+        let headerElement = $('<div><i class="fas fa-shopping-bag"></i> Shopping Room' + data.modal.displayCartNumber + '</div>');
         let headerToShow = '';
-        $('.cart-btn',headerElement).click(proceedCart);
+        $('body').on({
+            click: nextStep
+        }, '.body-next');
+
+        $('body').on({
+            click: backStep
+        }, '.body-back');
 
         headerToShow = headerElement;
         return headerToShow;
     }
+
+    var nextStep = function() {
+        let currentStep = data.step;
+        routeShow(data.step + 1);
+    }
+
+    var backStep = function() {
+        let currentStep = data.step;
+        routeShow(data.step - 1);
+    }
+
+    var routeShow = function(whichBody) {
+
+        if (data.cart.length < 1) { alert('The cart is empty.'); return 0; } //Block if cart is empty
+        $('.body-product').hide();
+        $('.body-' + whichBody).show();
+        data.step = whichBody;
+
+        setTimeout(() => {
+            runProcess(whichBody)
+        }, 500);
+
+    }
+
+    var runProcess = function(whichBody) {
+        if (whichBody === 1) { //Proceed to cart
+            runProceedToCart();
+        } else if (whichBody === 2) { //fill form
+
+        }
+    }
+
+    var runProceedToCart = function() {
+        let itemInCart = data.cart;
+        let itemGrouped = groupItem(itemInCart);
+        // console.log("item-inCart: ", itemInCart);
+        console.log("item-grouped: ", itemGrouped);
+
+        return
+
+        $('.body-1-list').empty();
+        $.each(itemInCart, function(index, item) {
+            var newItem = $(data.modal.proceed.list);
+            $('.body-1-list').append(newItem);
+        });
+        $('.body-1-orderDetail').html('Loaded2!!!');
+    }
+
+    var groupItem = function(items) {
+        let tempItems = [];
+        $.each(items, function(index, item) { //find in items
+            if (tempItems.length === 0) { tempItems.push(item); } //initial
+            $.each(tempItems, function(i, tempItem) {
+                if ((item.typ === tempItem.typ) && (item.size === tempItem.size)) { //exist item same type, name, size
+                    if (index != 0) { tempItem.number = Number(item.number) + Number(tempItem.number) }; //count number of same product
+                } else { //not exist push into tempItem
+                    tempItem.push(item);
+                }
+            });
+        });
+        return tempItems;
+    }
+
+    // ########## [END]HEADER ZONE #########
 
     var createShowProduct = function(typ) {
 
@@ -222,7 +343,7 @@ var productList = (function() {
         });
 
         $('.list-img > div', bodyElement).click(function() {
-            $('.active-img > img').attr('src', $(this).attr('url')); 
+            $('.active-img > img').attr('src', $(this).attr('url'));
         });
 
         $('.product-size', bodyElement).click(function() {
@@ -238,27 +359,57 @@ var productList = (function() {
         $('.add-cart', bodyElement).click(addCart);
 
     }
-    
-    var routeShow = function(whichBody){
-        $('.body-product').hide();
-        $('body-'+whichBody).show();
-    }
-
-    var proceedCart = function(){
-        if(data.cart.length < 1){alert('The cart is empty.');return 0;}//Block if cart is empty
-        alert('The cart is not empty');
-        routeShow('proceed');
-    }
 
     var addCart = function() {
-        data.cart.push({
-            typ: $(this).attr('typ'),
-            name: data.products[$(this).attr('typ')].name,
-            number: $('.product-quantity').val(),
-            size: $('.product-size.active').attr('typ')
-        });
+        // console.log("lenght: ", data.cart.length);
+        let typeProduct = $(this).attr('typ');
+        let sizeProduct = $('.product-size.active').attr('typ');
+        let numberProduct = Number($('.product-quantity').val());
+        let nameProduct = data.products[$(this).attr('typ')].name;
+
+        if (data.cart.length === 0) {
+            console.log('case1')
+            data.cart.push({
+                typ: typeProduct,
+                name: nameProduct,
+                number: numberProduct,
+                size: sizeProduct
+            });
+        } else {
+
+            for (let index = 0; index < data.cart.length; index++) {
+
+                if (IsArrayExistValue(typeProduct, sizeProduct)) {
+                    data.cart[index].number += numberProduct;
+                    console.log('name: ', data.cart[index].name);
+                    console.log('case2')
+                } else {
+                    data.cart.push({
+                        typ: typeProduct,
+                        name: nameProduct,
+                        number: numberProduct,
+                        size: sizeProduct
+                    });
+                    console.log('case3')
+                }
+
+            }
+
+        }
+
+
+
         updateCartNumber() //update number at cart button
-        console.log("Cart object: ",data.cart);
+        console.log("Cart object: ", data.cart);
+    }
+
+    var IsArrayExistValue = function(typ, size) {
+
+        for (i = 0; i < data.cart.length; i++) {
+            if (data.cart[i].typ === typ && data.cart[i].size === size) { return true; };
+        }
+        return false;
+
     }
 
     var delCart = function(indexArrayToDelete) {
