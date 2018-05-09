@@ -361,54 +361,38 @@ var productList = (function() {
     }
 
     var addCart = function() {
-        // console.log("lenght: ", data.cart.length);
-        let typeProduct = $(this).attr('typ');
-        let sizeProduct = $('.product-size.active').attr('typ');
-        let numberProduct = Number($('.product-quantity').val());
-        let nameProduct = data.products[$(this).attr('typ')].name;
 
-        if (data.cart.length === 0) {
-            console.log('case1')
+        let typeProduct     = $(this).attr('typ');
+        let sizeProduct     = $('.product-size.active').attr('typ');
+        let numberProduct   = Number($('.product-quantity').val());
+        let nameProduct     = data.products[$(this).attr('typ')].name;
+
+        objExistValue = IsArrayExistValue( typeProduct, sizeProduct );
+        if( objExistValue.state ){//product exist
+                
+            data.cart[objExistValue.index].number = objExistValue.obj.number + numberProduct;
+
+        } else {//product not exist
+
             data.cart.push({
                 typ: typeProduct,
                 name: nameProduct,
                 number: numberProduct,
                 size: sizeProduct
             });
-        } else {
-
-            for (let index = 0; index < data.cart.length; index++) {
-
-                if (IsArrayExistValue(typeProduct, sizeProduct)) {
-                    data.cart[index].number += numberProduct;
-                    console.log('name: ', data.cart[index].name);
-                    console.log('case2')
-                } else {
-                    data.cart.push({
-                        typ: typeProduct,
-                        name: nameProduct,
-                        number: numberProduct,
-                        size: sizeProduct
-                    });
-                    console.log('case3')
-                }
-
-            }
 
         }
 
-
-
-        updateCartNumber() //update number at cart button
+        updateCartNumber(); //update number at cart button
         console.log("Cart object: ", data.cart);
     }
 
     var IsArrayExistValue = function(typ, size) {
 
         for (i = 0; i < data.cart.length; i++) {
-            if (data.cart[i].typ === typ && data.cart[i].size === size) { return true; };
+            if (data.cart[i].typ === typ && data.cart[i].size === size) { return { state:1, obj:data.cart[i], index:i }; };
         }
-        return false;
+        return { state:0, obj:{}, index:-1 };
 
     }
 
