@@ -31,8 +31,13 @@ var productList = (function() {
             proceed: {
                 list: `
                         <div class="row">
-                            <div class="col-xs-12 col-sm-3 col-md-3"><img class="proceed-list-img"></div>
-                            <div class="col-xs-4 col-sm-3 col-md-3">
+                            <div class="col-md-12">
+                                <h3><span class="proceed-list-name"></span></h3>
+                            </div>
+                            <div class="col-xs-4 col-sm-4 col-md-3">
+                                <img class="proceed-list-img">
+                            </div>
+                            <div class="col-xs-4 col-sm-4 col-md-3">
                                 Quantity:
                                 <select class="form-control proceed-list-number">
                                     <option>1</option>
@@ -47,7 +52,7 @@ var productList = (function() {
                                     <option>10</option>
                                 </select>
                             </div>
-                            <div class="col-xs-4 col-sm-3 col-md-3">
+                            <div class="col-xs-4 col-sm-4 col-md-3">
                                 Size:
                                 <select class="form-control proceed-list-size">
                                     <option>M</option>
@@ -55,10 +60,9 @@ var productList = (function() {
                                     <option>XL</option>
                                 </select>
                             </div>
-                            <div class="col-xs-4 col-sm-3 col-md-3 proceed-list-subtotal">
-                                Calculating...
+                            <div class="col-xs-12 col-sm-12 col-md-3 proceed-list-subtotal">
                             </div>
-                        </div>
+                        </div><hr>
                 `,
                 orderDetail: `
                     Order Detail!
@@ -220,22 +224,21 @@ var productList = (function() {
 
     var learnMore = function() {
         let typ = $(this).attr('typ');
-        let item = data.products[typ]
-        console.log(item)
+        let item = data.products[typ];
         let modal = BootstrapModal();
-        modal.header.append(createHeader());
-        modal.body.append(createShowProduct(typ));
-        modal.footer.append(data.modal.footer);
-        modal.shown(function() {
-            $('body').css({ 'overflow': 'hidden' });
-        });
-        modal.hidden(function() {
-            $('body').css({ 'overflow': 'auto' });
-        });
-        setTimeout(function() {
-            updateProductSelectedUI({ product: typ, size: data.modal.sizeActive });
-        }, 200);
-        modal.open();
+            modal.header.append(createHeader());
+            modal.body.append(createShowProduct(typ));
+            modal.footer.append(data.modal.footer);
+            modal.shown(function() {
+                $('body').css({ 'overflow': 'hidden' });
+            });
+            modal.hidden(function() {
+                $('body').css({ 'overflow': 'auto' });
+            });
+            setTimeout(function() {
+                updateProductSelectedUI({ product: typ, size: data.modal.sizeActive });
+            }, 200);
+            modal.open();
 
     }
 
@@ -291,17 +294,42 @@ var productList = (function() {
 
     var runProceedToCart = function() {
         let itemsInCart = data.cart;
-        console.log("product: ",data.products);
         $('.body-1-list').empty();
         $.each(itemsInCart, function(index, item) {
             let newItem = $(data.modal.proceed.list);
             $('.proceed-list-img',newItem).attr('src',data.products[item.typ].imgs.ex);//set image
-            $('.proceed-list-subtotal',newItem).html( ( Number( data.products[item.typ].details.itemsize[item.size].price ) )*( Number( item.number ) ) );//set subtotal
+            $('.proceed-list-name',newItem).html(data.products[item.typ].name);//set name 
             $('.proceed-list-number',newItem).val(item.number);//set number
             $('.proceed-list-size',newItem).val(item.size.toUpperCase());//set size
+
+            let subTotal = calculateSubTotal( data.products[item.typ].details.itemsize[item.size].price, item.number );
+            let icon = currencyIcon(data.products[item.typ].details.typeprice);
+            let deleteFromCartBtn = $('<a>').html('<i class="fas fa-trash"></i>');
+                deleteFromCartBtn.click(function(){
+                delCart(item.id);//delete product from cart
+                setTimeout(function(){
+                    runProceedToCart();
+                },200);
+            });
+            let DetailCalculate = data.products[item.typ].details.itemsize[item.size].price+' x '+item.number;
+            $('.proceed-list-subtotal',newItem).append( icon,' ',subTotal,deleteFromCartBtn );//set subtotal
             $('.body-1-list').append(newItem);
         });
         $('.body-1-orderDetail').html('Loaded2!!!');
+    }
+
+    var calculateSubTotal = function( productPrice, productNumber ){
+        let subTotal = null;
+            subTotal = ( Number( productPrice ) * Number( productNumber ) );
+        return subTotal;
+    }
+
+    var currencyIcon = function(typePrice){
+        let Icon = '';
+        if( typePrice  === 'usd' ){
+            Icon = '<i class="fas fa-dollar-sign"></i>';
+        }
+        return Icon;
     }
 
     // ########## [END]HEADER ZONE #########
@@ -364,6 +392,7 @@ var productList = (function() {
         } else {//product not exist
 
             data.cart.push({
+                id: typeProduct+'-'+sizeProduct,
                 typ: typeProduct,
                 name: nameProduct,
                 number: numberProduct,
@@ -376,16 +405,23 @@ var productList = (function() {
         console.log("Cart object: ", data.cart);
     }
 
+    var delCart = function(idProduct){
+        if( !confirm('Are you sure to remove it?') ){return 0;}
+        for(i = 0; i < data.cart.length; i++){
+            if( data.cart[i].id == idProduct  ){
+                data.cart.splice(i,1);
+            }
+        }
+        updateCartNumber(); //update number at cart button
+
+    }
+
     var IsArrayExistValue = function(typ, size) {
 
         for (i = 0; i < data.cart.length; i++) {
             if (data.cart[i].typ === typ && data.cart[i].size === size) { return { state:1, obj:data.cart[i], index:i }; };
         }
         return { state:0, obj:{}, index:-1 };
-
-    }
-
-    var delCart = function(indexArrayToDelete) {
 
     }
 
